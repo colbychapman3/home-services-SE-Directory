@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Star, CheckCircle, Clock, Phone, Building, X } from 'lucide-react';
+import { MapPin, Star, CheckCircle, Clock, Phone, Building, X, AlertTriangle } from 'lucide-react';
 
 const DetailsModal = ({ selectedProvider, closeDetailsModal, handleCallNow }) => {
   if (!selectedProvider) {
@@ -158,8 +158,20 @@ const DetailsModal = ({ selectedProvider, closeDetailsModal, handleCallNow }) =>
             </div>
           </div>
 
+          {/* Report an Issue Section */}
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-600 mb-2">Problem with this listing?</h3>
+            <a
+              href={`mailto:contact@example.com?subject=Issue Report for Listing: ${encodeURIComponent(selectedProvider.name)}&body=${encodeURIComponent(`I'd like to report an issue with the listing for "${selectedProvider.name}".\n\nIssue details:\n\n(Please describe the problem, e.g., incorrect phone number, business closed, etc.)\n\nListing ID (if known): ${selectedProvider.id}`)}`}
+              className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
+            >
+              <AlertTriangle size={16} className="mr-2" />
+              Report an Issue
+            </a>
+          </div>
+
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 mt-6"> {/* Added pt-6 and mt-6 for spacing */}
             <button
               onClick={() => handleCallNow(selectedProvider.phone)}
               className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center justify-center"
