@@ -1,0 +1,92 @@
+// Updated service providers with website and social media links
+const serviceProviders = [
+  {
+    id: 1,
+    name: "Okefenokee Plumbing Services",
+    category: "plumbing",
+    city: "Waycross",
+    phone: "(912) 283-4567",
+    rating: 4.8,
+    reviews: 127,
+    verified: true,
+    distance: "2.1 miles",
+    description: "Professional plumbing services for residential and commercial properties. Emergency repairs, drain cleaning, and new installations.",
+    services: ["Emergency Repairs", "Drain Cleaning", "Water Heater Installation", "Pipe Repair", "Bathroom Remodeling"],
+    hours: "24/7 Emergency Service",
+    website: "https://okefenokee-plumbing.com",
+    facebook: "https://facebook.com/okefenokee.plumbing",
+    instagram: "https://instagram.com/okefenokee_plumbing"
+  },
+  {
+    id: 2,
+    name: "Golden Isles Electric",
+    category: "electrical",
+    city: "Brunswick",
+    phone: "(912) 265-8901",
+    rating: 4.9,
+    reviews: 203,
+    verified: true,
+    distance: "15.3 miles",
+    description: "Licensed electricians serving the Golden Isles area. Residential and commercial electrical services with 24/7 emergency response.",
+    services: ["Electrical Repairs", "Panel Upgrades", "Wiring Installation", "Generator Installation", "Emergency Service"],
+    hours: "Mon-Fri 7AM-6PM, Emergency 24/7",
+    website: "https://goldenisleselectric.com",
+    facebook: "https://facebook.com/goldenisles.electric",
+    google: "https://g.page/golden-isles-electric"
+  },
+  {
+    id: 3,
+    name: "Southeast Georgia HVAC",
+    category: "hvac",
+    city: "Waycross",
+    phone: "(912) 283-7890",
+    rating: 4.7,
+    reviews: 156,
+    verified: true,
+    distance: "3.2 miles",
+    description: "Complete heating and cooling solutions for Southeast Georgia. AC repair, installation, and maintenance services.",
+    services: ["AC Repair", "Heating Installation", "Duct Cleaning", "Maintenance Plans", "Emergency Service"],
+    hours: "Mon-Sat 7AM-6PM",
+    website: "https://segahvac.com",
+    facebook: "https://facebook.com/segahvac",
+    nextdoor: "https://nextdoor.com/business/southeast-georgia-hvac"
+  },
+  {
+    id: 4,
+    name: "Swamp Country Pest Control",
+    category: "pest-control",
+    city: "Folkston",
+    phone: "(912) 496-3456",
+    rating: 4.6,
+    reviews: 89,
+    verified: true,
+    distance: "18.7 miles",
+    description: "Comprehensive pest control services for homes and businesses. Specializing in termite treatment and wildlife removal.",
+    services: ["Termite Treatment", "Ant Control", "Rodent Removal", "Wildlife Control", "Quarterly Service"],
+    hours: "Mon-Fri 8AM-5PM",
+    website: "https://swampcountrypest.com",
+    facebook: "https://facebook.com/swampcountrypest",
+    yelp: "https://yelp.com/biz/swamp-country-pest-control"
+  },
+  {
+    id: 5,
+    name: "Coastal Contractors LLC",
+    category: "general-contractor",
+    city: "Brunswick",
+    phone: "(912) 265-4567",
+    rating: 4.8,
+    reviews: 178,
+    verified: true,
+    distance: "16.1 miles",
+    description: "Full-service general contractors specializing in home renovations, additions, and commercial construction projects.",
+    services: ["Home Renovations", "Kitchen Remodeling", "Bathroom Remodeling", "Additions", "Commercial Construction"],
+    hours: "Mon-Fri 7AM-5PM",
+    website: "https://coastalcontractorsga.com",
+    facebook: "https://facebook.com/coastalcontractorsllc",
+    instagram: "https://instagram.com/coastal_contractors_ga",
+    linkedin: "https://linkedin.com/company/coastal-contractors-llc"
+  }
+];
+
+export default serviceProviders;
+
