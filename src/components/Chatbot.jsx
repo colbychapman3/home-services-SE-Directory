@@ -46,79 +46,14 @@ const Chatbot = ({ serviceProviders, serviceCategories, cities }) => {
 
     // Simulate bot thinking
     setTimeout(() => {
-      const botResponse = generateBotResponse(inputValue, serviceProviders, serviceCategories, cities);
+      const botResponseText = generateBotResponse(inputValue, serviceProviders, serviceCategories, cities);
       setMessages(prev => [...prev, {
-        text: botResponse,
+        text: botResponseText,
         sender: 'bot',
         timestamp: new Date()
       }]);
       setIsTyping(false);
     }, 1000);
-  };
-
-  const generateBotResponse = (userInput, serviceProviders, serviceCategories, cities) => {
-    const input = userInput.toLowerCase();
-    
-    // Check for greetings
-    if (input.match(/^(hi|hello|hey|howdy)/i)) {
-      return "Hello! How can I help you find local services in Southeast Georgia today?";
-    }
-    
-    // Check for service category questions
-    for (const category of serviceCategories) {
-      if (input.includes(category.id) || input.includes(category.name.toLowerCase())) {
-        const providers = serviceProviders.filter(p => p.category === category.id);
-        if (providers.length > 0) {
-          const topProviders = providers.slice(0, 3).map(p => `• ${p.name} (${p.city}) - ${p.rating}★`).join('\\n');
-          return `I found ${providers.length} ${category.name} services in our directory. Here are the top rated options:\\n\\n${topProviders}\\n\\nWould you like more information about any of these providers?`;
-        }
-      }
-    }
-    
-    // Check for city-specific questions
-    for (const city of cities) {
-      if (input.includes(city.toLowerCase())) {
-        const providers = serviceProviders.filter(p => p.city.toLowerCase() === city.toLowerCase());
-        if (providers.length > 0) {
-          return `We have ${providers.length} service providers in ${city}. What type of service are you looking for? (e.g., plumbing, electrical, HVAC)`;
-        }
-      }
-    }
-    
-    // Check for emergency service questions
-    if (input.includes('emergency') || input.includes('24/7') || input.includes('urgent')) {
-      const emergencyProviders = serviceProviders.filter(p => 
-        p.hours.toLowerCase().includes('emergency') || 
-        p.hours.includes('24/7') || 
-        p.services.some(s => s.toLowerCase().includes('emergency'))
-      );
-      
-      if (emergencyProviders.length > 0) {
-        const topEmergency = emergencyProviders.slice(0, 3).map(p => `• ${p.name} (${p.category}) - ${p.phone}`).join('\\n');
-        return `Here are emergency service providers available in Southeast Georgia:\\n\\n${topEmergency}\\n\\nWould you like me to help you contact any of these providers?`;
-      }
-    }
-    
-    // Check for specific business questions
-    for (const provider of serviceProviders) {
-      if (input.includes(provider.name.toLowerCase())) {
-        const services = provider.services.join(', ');
-        return `${provider.name} is located in ${provider.city} with a rating of ${provider.rating}★ from ${provider.reviews} reviews. They offer: ${services}. Their hours are: ${provider.hours}. You can contact them at ${provider.phone}.`;
-      }
-    }
-    
-    // Check for help with finding services
-    if (input.includes('find') || input.includes('looking for') || input.includes('need') || input.includes('search')) {
-      return "I can help you find services! Please tell me what type of service you're looking for (plumbing, electrical, etc.) and which city in Southeast Georgia.";
-    }
-    
-    // Check for questions about the directory
-    if (input.includes('directory') || input.includes('website') || input.includes('site')) {
-      return "The Southeast Georgia Home Services Directory connects residents with trusted local service providers across Waycross, Brunswick, Hoboken, Blackshear, Folkston, Jesup, and surrounding areas. We feature verified businesses with real customer reviews.";
-    }
-    
-    // Default response
-    return "I'm here to help you find local home services in Southeast Georgia. You can ask me about specific services like plumbing or HVAC, search by city, or get information about emergency services. How can I assist you today?";
   };
 
   return (
@@ -311,6 +246,116 @@ const Chatbot = ({ serviceProviders, serviceCategories, cities }) => {
       `}</style>
     </>
   );
+};
+
+// --- Intent Logic Refactor ---
+
+const intentRules = [
+  {
+    name: "greeting",
+    test: (input) => /^(hi|hello|hey|howdy)/i.test(input),
+    getResponse: () => "Hello! How can I help you find local services in Southeast Georgia today?"
+  },
+  {
+    name: "findByCategory",
+    test: (input, serviceCategories) => serviceCategories.some(category => {
+      const categoryIdRegex = new RegExp(`\\b${category.id.toLowerCase()}\\b`, 'i');
+      const categoryNameRegex = new RegExp(`\\b${category.name.toLowerCase()}\\b`, 'i');
+      return categoryIdRegex.test(input) || categoryNameRegex.test(input);
+    }),
+    getResponse: (userInput, serviceProviders, serviceCategories) => {
+      const input = userInput.toLowerCase();
+      for (const category of serviceCategories) {
+        if (input.includes(category.id) || input.includes(category.name.toLowerCase())) {
+          const providers = serviceProviders.filter(p => p.category === category.id);
+          if (providers.length > 0) {
+            const topProviders = providers.slice(0, 3).map(p => `• ${p.name} (${p.city}) - ${p.rating}★`).join('\\n');
+            return `I found ${providers.length} ${category.name} services in our directory. Here are the top rated options:\\n\\n${topProviders}\\n\\nWould you like more information about any of these providers?`;
+          }
+        }
+      }
+      return null;
+    }
+  },
+  {
+    name: "findByCity",
+    test: (input, serviceCategories, cities) => cities.some(city => {
+      const cityRegex = new RegExp(`\\b${city.toLowerCase()}\\b`, 'i');
+      return cityRegex.test(input);
+    }),
+    getResponse: (userInput, serviceProviders, serviceCategories, cities) => {
+      const input = userInput.toLowerCase();
+      for (const city of cities) {
+        if (input.includes(city.toLowerCase())) {
+          const providers = serviceProviders.filter(p => p.city.toLowerCase() === city.toLowerCase());
+          if (providers.length > 0) {
+            return `We have ${providers.length} service providers in ${city}. What type of service are you looking for? (e.g., plumbing, electrical, HVAC)`;
+          }
+        }
+      }
+      return null;
+    }
+  },
+  {
+    name: "findEmergencyServices",
+    test: (input) => /emergency|24\/7|urgent/i.test(input),
+    getResponse: (userInput, serviceProviders) => {
+      const emergencyProviders = serviceProviders.filter(p =>
+        p.hours.toLowerCase().includes('emergency') ||
+        p.hours.includes('24/7') ||
+        p.services.some(s => s.toLowerCase().includes('emergency'))
+      );
+      if (emergencyProviders.length > 0) {
+        const topEmergency = emergencyProviders.slice(0, 3).map(p => `• ${p.name} (${p.category}) - ${p.phone}`).join('\\n');
+        return `Here are emergency service providers available in Southeast Georgia:\\n\\n${topEmergency}\\n\\nWould you like me to help you contact any of these providers?`;
+      }
+      // Fallback if test passes but no specific emergency providers found
+      return "I couldn't find specific listings for 24/7 or emergency services right now, but many providers offer emergency hours. You can try asking for a specific service type and I'll do my best to help.";
+    }
+  },
+  {
+    name: "findSpecificBusiness",
+    test: (input, serviceCategories, cities, serviceProviders) => serviceProviders.some(provider => {
+      // Escape special regex characters in provider name
+      const escapedProviderName = provider.name.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const providerNameRegex = new RegExp(`\\b${escapedProviderName}\\b`, 'i');
+      return providerNameRegex.test(input);
+    }),
+    getResponse: (userInput, serviceProviders) => {
+      const input = userInput.toLowerCase();
+      for (const provider of serviceProviders) {
+        if (input.includes(provider.name.toLowerCase())) {
+          const services = provider.services.join(', ');
+          return `${provider.name} is located in ${provider.city} with a rating of ${provider.rating}★ from ${provider.reviews} reviews. They offer: ${services}. Their hours are: ${provider.hours}. You can contact them at ${provider.phone}.`;
+        }
+      }
+      return null;
+    }
+  },
+  {
+    name: "aboutDirectory",
+    test: (input) => /directory|website|site/i.test(input),
+    getResponse: () => "The Southeast Georgia Home Services Directory connects residents with trusted local service providers across Waycross, Brunswick, Hoboken, Blackshear, Folkston, Jesup, and surrounding areas. We feature verified businesses with real customer reviews."
+  },
+  {
+    name: "helpFindingServices", // Lower priority, so it's after more specific checks
+    test: (input) => /find|looking for|need|search/i.test(input),
+    getResponse: () => "I can help you find services! Please tell me what type of service you're looking for (plumbing, electrical, etc.) and which city in Southeast Georgia."
+  }
+];
+
+const generateBotResponse = (userInput, serviceProviders, serviceCategories, cities) => {
+  const input = userInput.toLowerCase();
+
+  for (const rule of intentRules) {
+    if (rule.test(input, serviceCategories, cities, serviceProviders)) {
+      const response = rule.getResponse(userInput, serviceProviders, serviceCategories, cities);
+      if (response) return response; // Ensure getResponse actually returned something
+    }
+  }
+
+  // Default response if no rules match
+  return "I'm here to help you find local home services in Southeast Georgia. You can ask me about specific services like plumbing or HVAC, search by city, or get information about emergency services. How can I assist you today?";
 };
 
 export default Chatbot;
