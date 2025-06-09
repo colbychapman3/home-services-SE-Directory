@@ -35,10 +35,11 @@ const Header = ({ mobileMenuOpen, setMobileMenuOpen }) => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            <Link to="/" className={getLinkClasses('/')}>
-              Home
-            </Link>
+          <div className="hidden md:flex items-center space-x-8">
+            <nav className="space-x-8">
+              <Link to="/" className={getLinkClasses('/')}>
+                Home
+              </Link>
             <Link to="/" className={getLinkClasses('/categories')}> {/* Assuming /categories will be a future route */}
               Categories
             </Link>
